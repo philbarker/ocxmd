@@ -42,6 +42,18 @@ JSON-LD output
 </script>
 ```
 
+## Requirements & dependencies
+Python 3 (tested on Python 3.6.7)
+
+Designed for use with [MkDocs](https://www.mkdocs.org/#installation)
+
+Uses python packages [Python-Markdown](https://python-markdown.github.io/install/), [PyYAML](https://pyyaml.org/wiki/PyYAMLDocumentation) and [json](https://docs.python.org/3.7/library/json.html).
+
+Installation with setup.py requires [setuptools](https://setuptools.readthedocs.io/en/latest/setuptools.html#installing-setuptools)
+
+## Installation
+
+
 ## Usage
 The YAML must be separated from the rest of the text by `---` before and after.
 
