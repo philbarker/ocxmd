@@ -51,12 +51,77 @@ Uses python packages [Python-Markdown](https://python-markdown.github.io/install
 
 Installation with setup.py requires [setuptools](https://setuptools.readthedocs.io/en/latest/setuptools.html#installing-setuptools)
 
+Doesn't play nicely with other python markdown extensions that use `---` to delineate YAML (or anything else), notably the meta extension.
+
 ## Installation
+(Warning: exercise caution thi searly release software with no warranty, test this first in a virtual environment!)
+```
+(venv)$ git clone https://github.com/philbarker/ocxmd.git
+(venv)$ cd ocxmd
+(venv)$ python setup.py test
+(venv)$ python setup.py install
+(venv)$ python test.py
+```
 
 
 ## Usage
-The YAML must be separated from the rest of the text by `---` before and after.
+Add `ocxmd` to your extensions block in mkdocs.yml:
+```
+markdown_extensions:
+  - ocxmd
+```
 
+The YAML must be separated from the rest of the markdown text by `---` before and after.
+
+```
+#YAML to JSON-LD test
+---
+"@id": "#Lesson1"
+name: "Test Lesson 1"
+"@type":
+    - oer:Lesson
+    - CreativeWork
+learningResourceType: LessonPlan
+hasPart: {
+  "@id": "#activity1"
+}
+author:
+    "@type": Person
+    name: Fred Blogs
+---
+
+I started with some YAML and turned it into JSON-LD
+
+Here is some more YAML
+---
+"@id": "#activity1"
+"@type":
+    - oer:Activity
+    - CreativeWork
+name: "Test Activity 1.1"
+learningResourceType: Activity
+---
+
+```
+All going well you will have to view source or inspect the HTML to see the output.
+
+Can also be used in python to get metadata from YAML as a python dict
+
+``` python
+import markdown
+from ocxmd import OCXMetadata
+TESTINPUT = '''
+#YAML to JSON-LD test
+---
+"@id": "#Lesson1"
+name: "Test Lesson 1"
+---
+I started with some YAML and turned it into JSON-LD
+'''
+md = markdown.Markdown(extensions = ['ocxmd'])
+print( md.convert(TESTINPUT) )
+print( md.meta )
+```
 
 ## Acknowledgements
 I was helped in writing this by reference to Nikita Sivakov's [full-yaml-metadata extension](https://github.com/sivakov512/python-markdown-full-yaml-metadata)
