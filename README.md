@@ -1,11 +1,13 @@
-An extension to [python markdown](https://python-markdown.github.io/) that takes metadata embedded as YAML in a page of markdown and render it as JSON-LD in the HTML created by [MkDocs](https://www.mkdocs.org/). The extracted metadata is also returned as a python dict in the markdown object.
+An extension to [python markdown](https://python-markdown.github.io/) that:
+- allows you to add semantic HTML5 sectioning elements into the generated html by putting strings such as `~~S~~` at the start of a section and `~~/S~~` at the end. Sectioning elements supported are `section` (S), `chapter` (C) `header` (H) `footer` (F) `nav` (N) `div` (D) and `article` (A). These can be given identifiers by add text after the sectioning element letter, e.g. `~~S lesson1~~`. Spaces in the identifier are removed. So `~~A activity 1~~` becomes `<article id="activity1">`.
+- takes metadata embedded as YAML in a page of markdown and render it as JSON-LD in the HTML created by [MkDocs](https://www.mkdocs.org/). The extracted metadata is also returned as a python dict in the markdown object.
 
 Currently it is focussed on schema.org and other metadata schema used by the [K12-OCX project](https://github.com/K12OCX/k12ocx-specs) for curriculum content materials (learning resources).
 
 ## Test metadata
 YAML input
 ```
-"@id": "#Lesson1"
+"@id": "#lesson1"
 "@type":
     - oer:Lesson
     - CreativeWork
@@ -27,7 +29,7 @@ JSON-LD output
       "ocx": "https://github.com/K12OCX/k12ocx-specs/",
     }
   ],
-  "@id": "#Lesson1",
+  "@id": "#lesson1",
   "@type":["CreativeWork", "oer:Lesson"],
   "learningResourceType": "LessonPlan",
   "name": "Practice Counting Strategies",
@@ -41,6 +43,8 @@ JSON-LD output
 }
 </script>
 ```
+
+See test.py for a fully working example embedded in markdown.
 
 ## Requirements & dependencies
 Python 3 (tested on Python 3.6.7)
