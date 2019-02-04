@@ -1,6 +1,4 @@
-An extension to [python markdown](https://python-markdown.github.io/) that:
-- allows you to add semantic HTML5 sectioning elements into the generated html by putting strings such as `~~S~~` at the start of a section and `~~/S~~` at the end. Sectioning elements supported are `section` (S), `chapter` (C) `header` (H) `footer` (F) `nav` (N) `div` (D) and `article` (A). These can be given identifiers by add text after the sectioning element letter, e.g. `~~S lesson1~~`. Spaces in the identifier are removed. So `~~A activity 1~~` becomes `<article id="activity1">`.
-- takes metadata embedded as YAML in a page of markdown and render it as JSON-LD in the HTML created by [MkDocs](https://www.mkdocs.org/). The extracted metadata is also returned as a python dict in the markdown object.
+An extension to [python markdown](https://python-markdown.github.io/) that takes metadata embedded as YAML in a page of markdown and render it as JSON-LD in the HTML created by [MkDocs](https://www.mkdocs.org/). The extracted metadata is also returned as a python dict in the markdown object.
 
 Currently it is focussed on schema.org and other metadata schema used by the [K12-OCX project](https://github.com/K12OCX/k12ocx-specs) for curriculum content materials (learning resources).
 
@@ -17,7 +15,7 @@ hasPart: {
 }
 author:
     "@type": Person
-    name: Fred Blogs
+    name: Phil Barker
 
 ```
 
@@ -38,7 +36,7 @@ JSON-LD output
   }
   "author": {
     "@type": "Person"
-    "name": "Fred"
+    "name": "Phil Barker"
   }
 }
 </script>
@@ -58,7 +56,7 @@ Installation with setup.py requires [setuptools](https://setuptools.readthedocs.
 Doesn't play nicely with other python markdown extensions that use `---` to delineate YAML (or anything else), notably the meta extension.
 
 ## Installation
-(Warning: exercise caution thi searly release software with no warranty, test this first in a virtual environment!)
+(Warning: exercise caution this early release software with no warranty, test this first in a virtual environment!)
 ```
 (venv)$ git clone https://github.com/philbarker/ocxmd.git
 (venv)$ cd ocxmd
