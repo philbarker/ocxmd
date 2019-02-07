@@ -65,15 +65,37 @@ Doesn't play nicely with other python markdown extensions that use `---` to deli
 (venv)$ python test.py
 ```
 
-
-## Usage
+## Usage in MkDocs
 Add `ocxmd` to your extensions block in mkdocs.yml:
 ```
 markdown_extensions:
   - ocxmd
 ```
+You may have to restart MkDocs for this to take.
 
+## Usage in Python scripts
+``` python
+import markdown
+from ocxmd import OCXMetadata
+TESTINPUT = '''
+#YAML to JSON-LD test
+---
+"@id": "#Lesson1"
+name: "Test Lesson 1"
+---
+I started with some YAML and turned it into JSON-LD
+'''
+md = markdown.Markdown(extensions = ['ocxmd'])
+print( md.convert(TESTINPUT) )
+print( md.meta )
+```
+
+## YAML in Markdown
 The YAML must be separated from the rest of the markdown text by `---` before and after.
+
+The information for the context is hardwired (To do: make this configurable), the default namespace schema.org
+
+Because YAML expects the first character of a key or value to be alphanumeric it is safest to quote any keys or values required by JSON-LD to begin with `@` or `#` etc.
 
 ```
 #YAML to JSON-LD test
@@ -107,23 +129,6 @@ learningResourceType: Activity
 ```
 All going well you will have to view source or inspect the HTML to see the output.
 
-Can also be used in python to get metadata from YAML as a python dict
-
-``` python
-import markdown
-from ocxmd import OCXMetadata
-TESTINPUT = '''
-#YAML to JSON-LD test
----
-"@id": "#Lesson1"
-name: "Test Lesson 1"
----
-I started with some YAML and turned it into JSON-LD
-'''
-md = markdown.Markdown(extensions = ['ocxmd'])
-print( md.convert(TESTINPUT) )
-print( md.meta )
-```
 
 ## Acknowledgements
 I was helped in writing this by reference to Nikita Sivakov's [full-yaml-metadata extension](https://github.com/sivakov512/python-markdown-full-yaml-metadata)
