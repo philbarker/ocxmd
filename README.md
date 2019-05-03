@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/philbarker/ocxmd.svg?branch=master)](https://travis-ci.org/philbarker/ocxmd)
 An extension to [python markdown](https://python-markdown.github.io/) that takes metadata embedded as YAML in a page of markdown and render it as JSON-LD in the HTML created by [MkDocs](https://www.mkdocs.org/). The extracted metadata is also returned as a python dict in the markdown object.
 
 Currently it is focussed on schema.org and other metadata schema used by the [K12-OCX project](https://github.com/K12OCX/k12ocx-specs) for curriculum content materials (learning resources).
