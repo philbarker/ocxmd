@@ -2,16 +2,14 @@
 
 An extension to [python markdown](https://python-markdown.github.io/) that takes metadata embedded as YAML in a page of markdown and render it as JSON-LD in the HTML created by [MkDocs](https://www.mkdocs.org/). The extracted metadata is also returned as a python dict in the markdown object.
 
-The default JSON-LD context is schema.org, but this can be over-ridden as an option.
-
 Currently development is focussed on the needs of the [K12-OCX project](https://github.com/K12OCX/k12ocx-specs) for curriculum content materials (learning resources).
 
 ## Test metadata
 YAML input
 ```
+"@context": "http://schema.org"
 "@id": "#lesson1"
 "@type":
-    - oer:Lesson
     - CreativeWork
 learningResourceType: LessonPlan
 hasPart: {
@@ -28,7 +26,7 @@ Default JSON-LD output
 <script type="application/ld+json">
 { "@context":  "http://schema.org",
   "@id": "#lesson1",
-  "@type":["CreativeWork", "oer:Lesson"],
+  "@type":["CreativeWork"],
   "learningResourceType": "LessonPlan",
   "name": "Practice Counting Strategies",
   "hasPart": {
@@ -41,8 +39,9 @@ Default JSON-LD output
 }
 </script>
 ```
+Optionally the context string can be omitted and specified as an option when calling the extension (useful if you have a complex context and several blocks of metadata).
 
-See test.py for a fully working example embedded in markdown.
+See test.py for fully working examples embedded in markdown.
 
 ## Requirements & dependencies
 Python 3 (tested on Python 3.6.7)
@@ -103,10 +102,10 @@ Because YAML expects the first character of a key or value to be alphanumeric it
 ```
 #YAML to JSON-LD test
 ---
+"@context": "http://schema.org"
 "@id": "#Lesson1"
 name: "Test Lesson 1"
 "@type":
-    - oer:Lesson
     - CreativeWork
 learningResourceType: LessonPlan
 hasPart: {
@@ -121,9 +120,9 @@ I started with some YAML and turned it into JSON-LD
 
 Here is some more YAML
 ---
+"@context": "http://schema.org"
 "@id": "#activity1"
 "@type":
-    - oer:Activity
     - CreativeWork
 name: "Test Activity 1.1"
 learningResourceType: Activity
