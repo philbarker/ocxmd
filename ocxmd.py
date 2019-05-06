@@ -3,9 +3,7 @@ from markdown.preprocessors import Preprocessor
 import yaml, json
 
 OCX_YAML_STARTER = "---"
-YAML_CONTEXT = """
-"@context": "http://schema.org"
-"""
+
 SCRIPT_STARTER = '<script type="application/ld+json">'
 
 
@@ -14,7 +12,7 @@ class OCXMetadata(Extension):
 
     def __init__(self, *args, **kwargs):
         # define config option for specifying JSON-LD context
-        self.config = {"context": [YAML_CONTEXT, "Specify JSON-LD context"]}
+        self.config = {"context": ["", "Specify JSON-LD context"]}
         super(OCXMetadata, self).__init__(*args, **kwargs)
 
     def extendMarkdown(self, md):
