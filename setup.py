@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="ocxmd",
-    version="0.1",
+    version="0.2",
     py_modules=["ocxmd"],
     install_requires=["markdown>=3.0", "PyYAML>=3.13"],
     author="Phil Barker",
