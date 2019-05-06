@@ -2,7 +2,7 @@
 
 An extension to [python markdown](https://python-markdown.github.io/) that takes metadata embedded as YAML in a page of markdown and render it as JSON-LD in the HTML created by [MkDocs](https://www.mkdocs.org/). The extracted metadata is also returned as a python dict in the markdown object.
 
-The default JSON-LD context is schema.org, but this can be over-ridden as an option
+The default JSON-LD context is schema.org, but this can be over-ridden as an option.
 
 Currently development is focussed on the needs of the [K12-OCX project](https://github.com/K12OCX/k12ocx-specs) for curriculum content materials (learning resources).
 
@@ -23,14 +23,10 @@ author:
 
 ```
 
-JSON-LD output
+Default JSON-LD output
 ```
 <script type="application/ld+json">
-{ "@context": [ "http://schema.org",
-    { "oer": "http://oerschema.org/",
-      "ocx": "https://github.com/K12OCX/k12ocx-specs/",
-    }
-  ],
+{ "@context":  "http://schema.org",
   "@id": "#lesson1",
   "@type":["CreativeWork", "oer:Lesson"],
   "learningResourceType": "LessonPlan",
@@ -64,17 +60,19 @@ Doesn't play nicely with other python markdown extensions that use `---` to deli
 ```
 (venv)$ git clone https://github.com/philbarker/ocxmd.git
 (venv)$ cd ocxmd
-(venv)$ python setup.py test
-(venv)$ python setup.py install
-(venv)$ python test.py
+(venv)$ pytest test.py
+(venv)$ python setup.py [test|develop|install]
 ```
 
 ## Usage in MkDocs
 Add `ocxmd` to your extensions block in mkdocs.yml:
 ```
 markdown_extensions:
-  - ocxmd
+  - ocxmd:
+     context: '"@context": "http://schema.org"'
 ```
+The context string can be changed to whatever you want.
+
 You may have to restart MkDocs for this to take.
 
 ## Usage in Python scripts
@@ -89,15 +87,16 @@ name: "Test Lesson 1"
 ---
 I started with some YAML and turned it into JSON-LD
 '''
-md = markdown.Markdown(extensions = ['ocxmd'])
+md = markdown.Markdown(
+    extensions=["ocxmd"],
+    extension_configs={"ocxmd": {"context": "'@context' : 'http://schema.org'"}},
+)
 print( md.convert(TESTINPUT) )
 print( md.meta )
 ```
 
 ## YAML in Markdown
 The YAML must be separated from the rest of the markdown text by `---` before and after.
-
-The information for the context is hardwired (To do: make this configurable), the default namespace schema.org
 
 Because YAML expects the first character of a key or value to be alphanumeric it is safest to quote any keys or values required by JSON-LD to begin with `@` or `#` etc.
 
