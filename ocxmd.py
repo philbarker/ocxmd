@@ -23,33 +23,36 @@ class OCXMetadata(Extension):
 
 
 class OCXMetadataPreprocessor(Preprocessor):
+    def process_yaml_block(self, lines, index):
+        yaml_block = [self.md.context] # start with the JSON-LD context
+        while lines:  # loop processing YAML block
+            line = lines.pop(0)
+            if line == "---":  # should be the end of a YAML block
+                self.yaml[index] = yaml.safe_load("\n".join(yaml_block))
+                new_line = (
+                    SCRIPT_STARTER
+                    + json.dumps(self.yaml[index])
+                    + "</script>"
+                )
+                return new_line # leave loop for processing YAML block
+            else: # if it's not the end of the YAML, add line to YAML
+                yaml_block.append(line)
+
     def run(self, lines):
         new_lines = []
-        yaml_store = {}
+        self.yaml = {}
         yaml_count = 0
-        yaml_context = self.md.context
+        self.ttl = {}
+        ttl_count = 0
         while lines:  # run through all the lines of md looking for YAML
             line = lines.pop(0)
             if line == "---":  # should be start of a YAML block
                 yaml_count += 1
-                yaml_block = [yaml_context]
-                while lines:  # loop processing YAML block
-                    line = lines.pop(0)
-                    if line == "---":  # should be the end of a YAML block
-                        yaml_store[yaml_count] = yaml.safe_load("\n".join(yaml_block))
-                        new_line = (
-                            SCRIPT_STARTER
-                            + json.dumps(yaml_store[yaml_count])
-                            + "</script>"
-                        )
-                        new_lines.append(new_line)
-                        break  # leave loop for processing YAML block
-                    else:
-                        yaml_block.append(line)
+                new_lines.append( self.process_yaml_block(lines, yaml_count) )
             else:
                 new_lines.append(line)
-        if yaml_store:
-            self.md.meta = yaml_store
+        if self.yaml:
+            self.md.meta = self.yaml
         else:
             self.md.meta = None
         return new_lines
