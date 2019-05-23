@@ -17,12 +17,13 @@ TESTINPUT_1_2 = """---
 I started with some YAML and turned it into JSON-LD
 """
 TESTINPUT_1_1_TTL = """---TTL
-@base: <http://schema.org/> .
-<#lesson1>
-  a CreativeWork
+@base <http://example.org> .
+@prefix sdo: <http://schema.org/> .
+@prefix ex: <http://example.org/> .
+<#lecture1> a sdo:CreativeWork  .
 ---
-#YAML to JSON-LD test
-I started with some YAML and turned it into JSON-LD
+#Turtle to JSON-LD test
+I started with some Turtle and turned it into JSON-LD
 """
 
 HTMLEXPECTED_1 = """<script type="application/ld+json">{"@context": "http://schema.org/", "@id": "#lesson1", "@type": "CreativeWork"}</script>
@@ -33,6 +34,20 @@ HTMLEXPECTED_1 = """<script type="application/ld+json">{"@context": "http://sche
 METADATAEXPECTED_1 = {
     1: {"@context": "http://schema.org/", "@id": "#lesson1", "@type": "CreativeWork"}
 }
+METADATAEXPECTED_1_TTL = {
+    1: '@base <http://example.org> .\n@prefix sdo: <http://schema.org/> .\n@prefix ex: <http://example.org/> .\n<#lecture1> a sdo:CreativeWork  .'
+}
+HTMLEXPECTED_1_TTL = """<script type="application/ld+json">[
+    {
+        "@id": "http://example.org#lecture1",
+        "@type": [
+            "http://schema.org/CreativeWork"
+        ]
+    }
+]</script>
+
+<h1>Turtle to JSON-LD test</h1>
+<p>I started with some Turtle and turned it into JSON-LD</p>"""
 
 TESTINPUT = """---
 "@id": "#lesson1"
@@ -170,5 +185,7 @@ def test3():
 def test1_1_TTL():
     md = markdown.Markdown(extensions=["ocxmd"])
     html = md.convert(TESTINPUT_1_1_TTL)
-    assert md.meta == METADATAEXPECTED_1
-    assert html == HTMLEXPECTED_1
+    print(md.meta)
+    print(html)
+    assert md.meta == METADATAEXPECTED_1_TTL
+    assert html == HTMLEXPECTED_1_TTL
