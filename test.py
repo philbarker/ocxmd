@@ -16,6 +16,14 @@ TESTINPUT_1_2 = """---
 #YAML to JSON-LD test
 I started with some YAML and turned it into JSON-LD
 """
+TESTINPUT_1_1_TTL = """---TTL
+@base: <http://schema.org/> .
+<#lesson1>
+  a CreativeWork
+---
+#YAML to JSON-LD test
+I started with some YAML and turned it into JSON-LD
+"""
 
 HTMLEXPECTED_1 = """<script type="application/ld+json">{"@context": "http://schema.org/", "@id": "#lesson1", "@type": "CreativeWork"}</script>
 
@@ -158,3 +166,9 @@ def test3():
     html = md.convert(TESTINPUT)
     assert md.meta == METADATAEXPECTED_3
     assert html == HTMLEXPECTED_3
+
+def test1_1_TTL():
+    md = markdown.Markdown(extensions=["ocxmd"])
+    html = md.convert(TESTINPUT_1_1_TTL)
+    assert md.meta == METADATAEXPECTED_1
+    assert html == HTMLEXPECTED_1
