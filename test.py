@@ -235,6 +235,12 @@ YAML_CONTEXT = """
     - "ocx": "https://github.com/K12OCX/k12ocx-specs/"
 """
 
+TTL_CONTEXT = """{
+    "@vocab": "http://schema.org/",
+    "oer": "http://oerschema.org",
+    "ocx": "https://github.com/K12OCX/k12ocx-specs/",
+}"""
+
 
 def test1_1():
     md = markdown.Markdown(extensions=["ocxmd"])
@@ -244,6 +250,20 @@ def test1_1():
 
 
 def test1_2():
+    # use context keyword keep as test for backward compatibility
+    md = markdown.Markdown(
+        extensions=["ocxmd"],
+        extension_configs={
+            "ocxmd": {"YAMLcontext": "'@context' : 'http://schema.org'"}
+        },
+    )
+    html = md.convert(TESTINPUT_1_1)
+    assert md.meta == METADATAEXPECTED_1
+    assert html == HTMLEXPECTED_1
+
+
+def test1_2_deprecated():
+    # use context keyword keep as test for backward compatibility
     md = markdown.Markdown(
         extensions=["ocxmd"],
         extension_configs={"ocxmd": {"context": "'@context' : 'http://schema.org'"}},
@@ -256,7 +276,9 @@ def test1_2():
 def test2():
     md = markdown.Markdown(
         extensions=["ocxmd"],
-        extension_configs={"ocxmd": {"context": "'@context' : 'http://schema.org'"}},
+        extension_configs={
+            "ocxmd": {"YAMLcontext": "'@context' : 'http://schema.org'"}
+        },
     )
     html = md.convert(TESTINPUT)
     assert md.meta == METADATAEXPECTED_2
@@ -265,7 +287,7 @@ def test2():
 
 def test3():
     md = markdown.Markdown(
-        extensions=["ocxmd"], extension_configs={"ocxmd": {"context": YAML_CONTEXT}}
+        extensions=["ocxmd"], extension_configs={"ocxmd": {"YAMLcontext": YAML_CONTEXT}}
     )
     html = md.convert(TESTINPUT)
     assert md.meta == METADATAEXPECTED_3
@@ -273,7 +295,7 @@ def test3():
 
 
 def test1_1_TTL():
-    md = markdown.Markdown(extensions=["ocxmd"])
+    md = markdown.Markdown(extensions=["ocxmd"], extension_configs={"ocxmd": {"TTLcontext": TTL_CONTEXT}})
     html = md.convert(TESTINPUT_1_1_TTL)
     g = Graph().parse(data=TTL_1_1, format="turtle")
     assert md.meta == None
@@ -282,7 +304,7 @@ def test1_1_TTL():
 
 
 def test_Mixed():
-    md = markdown.Markdown(extensions=["ocxmd"])
+    md = markdown.Markdown(extensions=["ocxmd"], extension_configs={"ocxmd": {"TTLcontext": TTL_CONTEXT}})
     html = md.convert(TESTINPUT_MIXED)
     g_ttl = Graph().parse(data=TTL_MIXED, format="turtle")
     print(md.meta)
