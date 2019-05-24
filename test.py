@@ -295,7 +295,9 @@ def test3():
 
 
 def test1_1_TTL():
-    md = markdown.Markdown(extensions=["ocxmd"], extension_configs={"ocxmd": {"TTLcontext": TTL_CONTEXT}})
+    md = markdown.Markdown(
+        extensions=["ocxmd"], extension_configs={"ocxmd": {"TTLcontext": TTL_CONTEXT}}
+    )
     html = md.convert(TESTINPUT_1_1_TTL)
     g = Graph().parse(data=TTL_1_1, format="turtle")
     assert md.meta == None
@@ -304,7 +306,9 @@ def test1_1_TTL():
 
 
 def test_Mixed():
-    md = markdown.Markdown(extensions=["ocxmd"], extension_configs={"ocxmd": {"TTLcontext": TTL_CONTEXT}})
+    md = markdown.Markdown(
+        extensions=["ocxmd"], extension_configs={"ocxmd": {"TTLcontext": TTL_CONTEXT}}
+    )
     html = md.convert(TESTINPUT_MIXED)
     g_ttl = Graph().parse(data=TTL_MIXED, format="turtle")
     print(md.meta)

@@ -29,7 +29,7 @@ class OCXMetadata(Extension):
         else:
             self.md.YAMLcontext = ""
         if self.getConfig("TTLcontext"):
-            # this is a string, assume easier for mkdocs yaml config?
+            # this is a string, easier for mkdocs yaml config?
             self.md.TTLcontext = ast.literal_eval(self.getConfig("TTLcontext"))
         else:
             self.md.TTLcontext = None
@@ -42,8 +42,10 @@ class OCXMetadataPreprocessor(Preprocessor):
         while lines:  # loop processing YAML block
             line = lines.pop(0)
             if line == "---":  # should be the end of a YAML block
-                self.yaml[index] = yaml.safe_load("\n".join(yaml_block))
-                new_line = SCRIPT_STARTER + json.dumps(self.yaml[index]) + "</script>"
+                self.md.meta[index] = yaml.safe_load("\n".join(yaml_block))
+                new_line = (
+                    SCRIPT_STARTER + json.dumps(self.md.meta[index]) + "</script>"
+                )
                 return new_line  # leave loop for processing YAML block
             else:  # if it's not the end of the YAML, add line to YAML
                 yaml_block.append(line)
@@ -68,7 +70,7 @@ class OCXMetadataPreprocessor(Preprocessor):
     def run(self, lines):
         new_lines = []
         count = 0  # running count of metadata blocks found
-        self.yaml = {}
+        self.md.meta = {}
         self.md.graphs = {}
         # run through all the lines of md looking for metadata blocks
         while lines:
@@ -81,10 +83,10 @@ class OCXMetadataPreprocessor(Preprocessor):
                 new_lines.append(self.process_ttl_block(lines, count))
             else:
                 new_lines.append(line)
-        if self.yaml:
-            self.md.meta = self.yaml
-        else:
+        if self.md.meta == {}:
             self.md.meta = None
+        if self.md.graphs == {}:
+            self.md.graphs = None
         return new_lines
 
 
