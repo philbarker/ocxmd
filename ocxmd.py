@@ -43,9 +43,8 @@ class OCXMetadataPreprocessor(Preprocessor):
             line = lines.pop(0)
             if line == "---":  # should be the end of a YAML block
                 self.md.meta[index] = yaml.safe_load("\n".join(yaml_block))
-                new_line = (
-                    SCRIPT_STARTER + json.dumps(self.md.meta[index]) + "</script>"
-                )
+                self.md.jsonld[index] = json.dumps(self.md.meta[index])
+                new_line = SCRIPT_STARTER + self.md.jsonld[index] + "</script>"
                 return new_line  # leave loop for processing YAML block
             else:  # if it's not the end of the YAML, add line to YAML
                 yaml_block.append(line)
@@ -59,10 +58,10 @@ class OCXMetadataPreprocessor(Preprocessor):
             if line == "---":  # should be the end of a YAML block
                 turtle = "\n".join(ttl_block)
                 self.md.graphs[index] = g.parse(data=turtle, format="turtle")
-                json_md = g.serialize(
+                self.md.jsonld[index] = g.serialize(
                     format="json-ld", indent=4, context=context
                 ).decode("utf-8")
-                new_line = SCRIPT_STARTER + json_md + "</script>"
+                new_line = SCRIPT_STARTER + self.md.jsonld[index] + "</script>"
                 return new_line  # leave loop for processing YAML block
             else:  # if it's not the end of the YAML, add line to YAML
                 ttl_block.append(line)
@@ -72,6 +71,7 @@ class OCXMetadataPreprocessor(Preprocessor):
         count = 0  # running count of metadata blocks found
         self.md.meta = {}
         self.md.graphs = {}
+        self.md.jsonld = {}
         # run through all the lines of md looking for metadata blocks
         while lines:
             line = lines.pop(0)
@@ -87,6 +87,8 @@ class OCXMetadataPreprocessor(Preprocessor):
             self.md.meta = None
         if self.md.graphs == {}:
             self.md.graphs = None
+        if self.md.jsonld == {}:
+            self.md.jsonld = None
         return new_lines
 
 

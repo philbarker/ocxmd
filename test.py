@@ -36,6 +36,10 @@ HTMLEXPECTED_1 = """<script type="application/ld+json">{"@context": "http://sche
 <h1>YAML to JSON-LD test</h1>
 <p>I started with some YAML and turned it into JSON-LD</p>"""
 
+JSONEXPECTED_1 = (
+    """{"@context": "http://schema.org/", "@id": "#lesson1", "@type": "CreativeWork"}"""
+)
+
 METADATAEXPECTED_1 = {
     1: {"@context": "http://schema.org/", "@id": "#lesson1", "@type": "CreativeWork"}
 }
@@ -54,7 +58,17 @@ HTMLEXPECTED_1_TTL = """<script type="application/ld+json">{
 
 <h1>Turtle to JSON-LD test</h1>
 <p>I started with some Turtle and turned it into JSON-LD</p>"""
-
+JSONEXPECTED_1_TTL = {
+    1: """{
+    "@context": {
+        "@vocab": "http://schema.org/",
+        "ocx": "https://github.com/K12OCX/k12ocx-specs/",
+        "oer": "http://oerschema.org"
+    },
+    "@id": "http://example.org#lecture1",
+    "@type": "CreativeWork"
+}"""
+}
 TESTINPUT = """---
 "@id": "#lesson1"
 name: "Test Lesson 1"
@@ -90,6 +104,11 @@ HTMLEXPECTED_3 = """<script type="application/ld+json">{"@context": ["http://sch
 <p>Here is some more YAML</p>
 <script type="application/ld+json">{"@context": ["http://schema.org", {"oer": "http://oerschema.org/"}, {"ocx": "https://github.com/K12OCX/k12ocx-specs/"}], "@id": "#activity1", "@type": ["oer:Activity", "CreativeWork"], "name": "Test Activity 1.1", "learningResourceType": "Activity"}</script>"""
 
+JSONEXPECTED_3 = {
+    1: '{"@context": ["http://schema.org", {"oer": "http://oerschema.org/"}, {"ocx": "https://github.com/K12OCX/k12ocx-specs/"}], "@id": "#lesson1", "name": "Test Lesson 1", "@type": ["oer:Lesson", "CreativeWork"], "learningResourceType": "LessonPlan", "hasPart": {"@id": "#activity1"}, "author": {"@type": "Person", "name": "Fred Blogs"}}',
+    2: '{"@context": ["http://schema.org", {"oer": "http://oerschema.org/"}, {"ocx": "https://github.com/K12OCX/k12ocx-specs/"}], "@id": "#activity1", "@type": ["oer:Activity", "CreativeWork"], "name": "Test Activity 1.1", "learningResourceType": "Activity"}',
+}
+
 HTMLEXPECTED_2 = """<script type="application/ld+json">{"@context": "http://schema.org", "@id": "#lesson1", "name": "Test Lesson 1", "@type": ["oer:Lesson", "CreativeWork"], "learningResourceType": "LessonPlan", "hasPart": {"@id": "#activity1"}, "author": {"@type": "Person", "name": "Fred Blogs"}}</script>
 
 <h1>YAML to JSON-LD test</h1>
@@ -97,6 +116,10 @@ HTMLEXPECTED_2 = """<script type="application/ld+json">{"@context": "http://sche
 <p>Here is some more YAML</p>
 <script type="application/ld+json">{"@context": "http://schema.org", "@id": "#activity1", "@type": ["oer:Activity", "CreativeWork"], "name": "Test Activity 1.1", "learningResourceType": "Activity"}</script>"""
 
+JSONEXPECTED_2 = {
+    1: '{"@context": "http://schema.org", "@id": "#lesson1", "name": "Test Lesson 1", "@type": ["oer:Lesson", "CreativeWork"], "learningResourceType": "LessonPlan", "hasPart": {"@id": "#activity1"}, "author": {"@type": "Person", "name": "Fred Blogs"}}',
+    2: '{"@context": "http://schema.org", "@id": "#activity1", "@type": ["oer:Activity", "CreativeWork"], "name": "Test Activity 1.1", "learningResourceType": "Activity"}',
+}
 
 METADATAEXPECTED_2 = {
     1: {
@@ -196,6 +219,36 @@ METADATAEXPECTED_MIXED = {
     }
 }
 
+JSONEXPECTED_MIXED = {
+    1: """{
+    "@context": {
+        "@vocab": "http://schema.org/",
+        "ocx": "https://github.com/K12OCX/k12ocx-specs/",
+        "oer": "http://oerschema.org"
+    },
+    "@graph": [
+        {
+            "@id": "http://example.org#lecture1",
+            "@type": "CreativeWork",
+            "author": {
+                "@id": "_:ub3bL8C13"
+            },
+            "hasPart": {
+                "@id": "http://example.org#activity1"
+            },
+            "learningResourceType": "LessonPlan",
+            "name": "Test Lesson 1"
+        },
+        {
+            "@id": "_:ub3bL8C13",
+            "@type": "Person",
+            "name": "Fred Blogs"
+        }
+    ]
+}""",
+    2: '{"@id": "#activity1", "@type": ["oer:Activity", "CreativeWork"], "name": "Test Activity 1.1", "learningResourceType": "Activity"}',
+}
+
 HTMLEXPECTED_MIXED = """<script type="application/ld+json">{
     "@context": {
         "@vocab": "http://schema.org/",
@@ -246,6 +299,8 @@ def test1_1():
     md = markdown.Markdown(extensions=["ocxmd"])
     html = md.convert(TESTINPUT_1_1)
     assert md.meta == METADATAEXPECTED_1
+    assert md.graphs == None
+    assert md.jsonld[1] == JSONEXPECTED_1
     assert html == HTMLEXPECTED_1
 
 
@@ -259,6 +314,8 @@ def test1_2():
     )
     html = md.convert(TESTINPUT_1_1)
     assert md.meta == METADATAEXPECTED_1
+    assert md.graphs == None
+    assert md.jsonld[1] == JSONEXPECTED_1
     assert html == HTMLEXPECTED_1
 
 
@@ -270,7 +327,6 @@ def test1_2_deprecated():
     )
     html = md.convert(TESTINPUT_1_1)
     assert md.meta == METADATAEXPECTED_1
-    assert html == HTMLEXPECTED_1
 
 
 def test2():
@@ -282,6 +338,8 @@ def test2():
     )
     html = md.convert(TESTINPUT)
     assert md.meta == METADATAEXPECTED_2
+    assert md.graphs == None
+    assert md.jsonld == JSONEXPECTED_2
     assert html == HTMLEXPECTED_2
 
 
@@ -291,6 +349,8 @@ def test3():
     )
     html = md.convert(TESTINPUT)
     assert md.meta == METADATAEXPECTED_3
+    assert md.graphs == None
+    assert md.jsonld == JSONEXPECTED_3
     assert html == HTMLEXPECTED_3
 
 
@@ -302,6 +362,7 @@ def test1_1_TTL():
     g = Graph().parse(data=TTL_1_1, format="turtle")
     assert md.meta == None
     assert compare.similar(md.graphs[1], g)
+    assert md.jsonld == JSONEXPECTED_1_TTL
     assert html == HTMLEXPECTED_1_TTL
 
 
@@ -315,5 +376,5 @@ def test_Mixed():
     print(html)
     assert md.meta == METADATAEXPECTED_MIXED
     assert compare.similar(md.graphs[1], g_ttl)
-    # cannot test html output because order of serialization is not fixed
     assert html == HTMLEXPECTED_MIXED
+    assert md.jsonld == JSONEXPECTED_MIXED
