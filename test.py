@@ -187,7 +187,14 @@ TTL_MIXED = """@base <http://example.org> .
     ] .
 """
 
-METADATAEXPECTED_MIXED = {2: {'@id': '#activity1', '@type': ['oer:Activity', 'CreativeWork'], 'name': 'Test Activity 1.1', 'learningResourceType': 'Activity'}}
+METADATAEXPECTED_MIXED = {
+    2: {
+        "@id": "#activity1",
+        "@type": ["oer:Activity", "CreativeWork"],
+        "name": "Test Activity 1.1",
+        "learningResourceType": "Activity",
+    }
+}
 
 HTMLEXPECTED_MIXED = """<script type="application/ld+json">{
     "@context": {
@@ -282,5 +289,5 @@ def test_Mixed():
     print(html)
     assert md.meta == METADATAEXPECTED_MIXED
     assert compare.similar(md.graphs[1], g_ttl)
-# cannot test html output because order of serialization is not fixed
+    # cannot test html output because order of serialization is not fixed
     assert html == HTMLEXPECTED_MIXED

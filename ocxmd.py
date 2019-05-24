@@ -55,7 +55,7 @@ class OCXMetadataPreprocessor(Preprocessor):
 
     def run(self, lines):
         new_lines = []
-        count = 0 # running count of metadata blocks found
+        count = 0  # running count of metadata blocks found
         self.yaml = {}
         self.md.graphs = {}
         # run through all the lines of md looking for metadata blocks
