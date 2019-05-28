@@ -21,7 +21,7 @@ class OCXMetadata(Extension):
         md.registerExtension(self)
         self.md = md
         if self.getConfig("YAMLcontext"):
-            # use YAMLcontext if both context and YAMLcontext are set
+            # use YAMLcontext, even if both context and YAMLcontext are set
             self.md.YAMLcontext = self.getConfig("YAMLcontext")
         elif self.getConfig("context"):
             # context is deprecated but check for backward compatibility
@@ -39,12 +39,17 @@ class OCXMetadata(Extension):
 class OCXMetadataPreprocessor(Preprocessor):
     def process_yaml_block(self, lines, index):
         yaml_block = [self.md.YAMLcontext]  # start with the JSON-LD context
+        g = rdflib.Graph()
+        context = self.md.TTLcontext
         while lines:  # loop processing YAML block
             line = lines.pop(0)
             if line == "---":  # should be the end of a YAML block
                 self.md.meta[index] = yaml.safe_load("\n".join(yaml_block))
                 self.md.jsonld[index] = json.dumps(self.md.meta[index])
                 new_line = SCRIPT_STARTER + self.md.jsonld[index] + "</script>"
+                self.md.graphs[index] = g.parse(
+                    data=self.md.jsonld[index], format="json-ld"
+                )
                 return new_line  # leave loop for processing YAML block
             else:  # if it's not the end of the YAML, add line to YAML
                 yaml_block.append(line)
@@ -61,6 +66,7 @@ class OCXMetadataPreprocessor(Preprocessor):
                 self.md.jsonld[index] = g.serialize(
                     format="json-ld", indent=4, context=context
                 ).decode("utf-8")
+                self.md.meta[index] = ast.literal_eval(self.md.jsonld[index])
                 new_line = SCRIPT_STARTER + self.md.jsonld[index] + "</script>"
                 return new_line  # leave loop for processing YAML block
             else:  # if it's not the end of the YAML, add line to YAML

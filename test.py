@@ -31,6 +31,18 @@ TTL_1_1 = """@base <http://schema.org/> .
 ex:lecture1 a <CreativeWork> .
 """
 
+METADATAEXPECTED_1_1_TTL = {
+    1: {
+        "@context": {
+            "@vocab": "http://schema.org/",
+            "ocx": "https://github.com/K12OCX/k12ocx-specs/",
+            "oer": "http://oerschema.org",
+        },
+        "@id": "http://example.org#lecture1",
+        "@type": "CreativeWork",
+    }
+}
+
 HTMLEXPECTED_1 = """<script type="application/ld+json">{"@context": "http://schema.org/", "@id": "#lesson1", "@type": "CreativeWork"}</script>
 
 <h1>YAML to JSON-LD test</h1>
@@ -211,12 +223,30 @@ TTL_MIXED = """@base <http://example.org> .
 """
 
 METADATAEXPECTED_MIXED = {
+    1: {
+        "@context": {
+            "@vocab": "http://schema.org/",
+            "ocx": "https://github.com/K12OCX/k12ocx-specs/",
+            "oer": "http://oerschema.org",
+        },
+        "@graph": [
+            {
+                "@id": "http://example.org#lecture1",
+                "@type": "CreativeWork",
+                "author": {"@id": "_:ub3bL8C13"},
+                "hasPart": {"@id": "http://example.org#activity1"},
+                "learningResourceType": "LessonPlan",
+                "name": "Test Lesson 1",
+            },
+            {"@id": "_:ub3bL8C13", "@type": "Person", "name": "Fred Blogs"},
+        ],
+    },
     2: {
         "@id": "#activity1",
         "@type": ["oer:Activity", "CreativeWork"],
         "name": "Test Activity 1.1",
         "learningResourceType": "Activity",
-    }
+    },
 }
 
 JSONEXPECTED_MIXED = {
@@ -349,6 +379,8 @@ def test3():
     )
     html = md.convert(TESTINPUT)
     assert md.meta == METADATAEXPECTED_3
+#to do: write sensible test for graph (need to check parsing is as expected, so look at triples)
+    print (md.graphs[1].serialize(format='turtle').decode("utf-8"))
     assert md.graphs == None
     assert md.jsonld == JSONEXPECTED_3
     assert html == HTMLEXPECTED_3
@@ -360,7 +392,7 @@ def test1_1_TTL():
     )
     html = md.convert(TESTINPUT_1_1_TTL)
     g = Graph().parse(data=TTL_1_1, format="turtle")
-    assert md.meta == None
+    assert md.meta == METADATAEXPECTED_1_1_TTL
     assert compare.similar(md.graphs[1], g)
     assert md.jsonld == JSONEXPECTED_1_TTL
     assert html == HTMLEXPECTED_1_TTL
@@ -373,7 +405,6 @@ def test_Mixed():
     html = md.convert(TESTINPUT_MIXED)
     g_ttl = Graph().parse(data=TTL_MIXED, format="turtle")
     print(md.meta)
-    print(html)
     assert md.meta == METADATAEXPECTED_MIXED
     assert compare.similar(md.graphs[1], g_ttl)
     assert html == HTMLEXPECTED_MIXED
