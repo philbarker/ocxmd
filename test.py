@@ -233,12 +233,12 @@ METADATAEXPECTED_MIXED = {
             {
                 "@id": "http://example.org#lecture1",
                 "@type": "CreativeWork",
-                "author": {"@id": "_:ub3bL8C13"},
+                "author": {"@id": "_:ub5bL8C13"},
                 "hasPart": {"@id": "http://example.org#activity1"},
                 "learningResourceType": "LessonPlan",
                 "name": "Test Lesson 1",
             },
-            {"@id": "_:ub3bL8C13", "@type": "Person", "name": "Fred Blogs"},
+            {"@id": "_:ub5bL8C13", "@type": "Person", "name": "Fred Blogs"},
         ],
     },
     2: {
@@ -261,7 +261,7 @@ JSONEXPECTED_MIXED = {
             "@id": "http://example.org#lecture1",
             "@type": "CreativeWork",
             "author": {
-                "@id": "_:ub3bL8C13"
+                "@id": "_:ub5bL8C13"
             },
             "hasPart": {
                 "@id": "http://example.org#activity1"
@@ -270,7 +270,7 @@ JSONEXPECTED_MIXED = {
             "name": "Test Lesson 1"
         },
         {
-            "@id": "_:ub3bL8C13",
+            "@id": "_:ub5bL8C13",
             "@type": "Person",
             "name": "Fred Blogs"
         }
@@ -290,7 +290,7 @@ HTMLEXPECTED_MIXED = """<script type="application/ld+json">{
             "@id": "http://example.org#lecture1",
             "@type": "CreativeWork",
             "author": {
-                "@id": "_:ub3bL8C13"
+                "@id": "_:ub5bL8C13"
             },
             "hasPart": {
                 "@id": "http://example.org#activity1"
@@ -299,7 +299,7 @@ HTMLEXPECTED_MIXED = """<script type="application/ld+json">{
             "name": "Test Lesson 1"
         },
         {
-            "@id": "_:ub3bL8C13",
+            "@id": "_:ub5bL8C13",
             "@type": "Person",
             "name": "Fred Blogs"
         }
@@ -329,7 +329,7 @@ def test1_1():
     md = markdown.Markdown(extensions=["ocxmd"])
     html = md.convert(TESTINPUT_1_1)
     assert md.meta == METADATAEXPECTED_1
-    assert md.graphs == None
+    assert len(md.graphs) == 1
     assert md.jsonld[1] == JSONEXPECTED_1
     assert html == HTMLEXPECTED_1
 
@@ -344,7 +344,7 @@ def test1_2():
     )
     html = md.convert(TESTINPUT_1_1)
     assert md.meta == METADATAEXPECTED_1
-    assert md.graphs == None
+    assert len(md.graphs) == 1
     assert md.jsonld[1] == JSONEXPECTED_1
     assert html == HTMLEXPECTED_1
 
@@ -368,7 +368,8 @@ def test2():
     )
     html = md.convert(TESTINPUT)
     assert md.meta == METADATAEXPECTED_2
-    assert md.graphs == None
+    g = Graph().parse(data='', format="turtle")
+    assert compare.similar(md.graphs[1], g)
     assert md.jsonld == JSONEXPECTED_2
     assert html == HTMLEXPECTED_2
 
@@ -378,10 +379,10 @@ def test3():
         extensions=["ocxmd"], extension_configs={"ocxmd": {"YAMLcontext": YAML_CONTEXT}}
     )
     html = md.convert(TESTINPUT)
+    g = Graph().parse(data='', format="turtle")
     assert md.meta == METADATAEXPECTED_3
 #to do: write sensible test for graph (need to check parsing is as expected, so look at triples)
-    print (md.graphs[1].serialize(format='turtle').decode("utf-8"))
-    assert md.graphs == None
+    assert compare.similar(md.graphs[1], g)
     assert md.jsonld == JSONEXPECTED_3
     assert html == HTMLEXPECTED_3
 
@@ -400,11 +401,10 @@ def test1_1_TTL():
 
 def test_Mixed():
     md = markdown.Markdown(
-        extensions=["ocxmd"], extension_configs={"ocxmd": {"TTLcontext": TTL_CONTEXT}}
+        extensions=["ocxmd"], extension_configs={"ocxmd": {"TTLcontext": '{"@vocab": "http://schema.org/","oer": "http://oerschema.org","ocx": "https://github.com/K12OCX/k12ocx-specs/"}'}}
     )
     html = md.convert(TESTINPUT_MIXED)
     g_ttl = Graph().parse(data=TTL_MIXED, format="turtle")
-    print(md.meta)
     assert md.meta == METADATAEXPECTED_MIXED
     assert compare.similar(md.graphs[1], g_ttl)
     assert html == HTMLEXPECTED_MIXED
